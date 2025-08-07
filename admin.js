@@ -140,19 +140,20 @@ class AdminPanel {
         const total = this.bookings.length;
         const pending = this.bookings.filter(b => b.status === 'new').length;
         const confirmed = this.bookings.filter(b => b.status === 'confirmed').length;
-        
-        // Calculate estimated revenue
-        let revenue = 0;
+
+        // Calculate outstanding revenue (exclude completed and cancelled orders)
+        let outstandingRevenue = 0;
         this.bookings.forEach(booking => {
-            if (booking.status !== 'cancelled') {
-                revenue += this.calculateBookingValue(booking);
+            // Only count revenue for orders that are not completed or cancelled
+            if (booking.status !== 'cancelled' && booking.status !== 'completed') {
+                outstandingRevenue += this.calculateBookingValue(booking);
             }
         });
 
         document.getElementById('total-bookings').textContent = total;
         document.getElementById('pending-bookings').textContent = pending;
         document.getElementById('confirmed-bookings').textContent = confirmed;
-        document.getElementById('estimated-revenue').textContent = `$${revenue.toLocaleString()}`;
+        document.getElementById('outstanding-revenue').textContent = `$${outstandingRevenue.toLocaleString()}`;
     }
 
     calculateBookingValue(booking) {
