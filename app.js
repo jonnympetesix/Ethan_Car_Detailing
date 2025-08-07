@@ -233,38 +233,65 @@ function initFormValidation() {
         input.setAttribute('aria-invalid', 'false');
     }
 
-    function submitForm() {
+    async function submitForm() {
         const submitButton = form.querySelector('button[type="submit"]');
         const originalText = submitButton.textContent;
-        
+
         // Show loading state
         submitButton.textContent = 'Sending...';
         submitButton.disabled = true;
         submitButton.setAttribute('aria-busy', 'true');
-        
-        // Simulate form submission (replace with actual form handling)
-        setTimeout(() => {
+
+        try {
+            // Collect form data
+            const formData = {
+                name: nameInput.value.trim(),
+                email: emailInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                service: serviceSelect.value,
+                addons: document.getElementById('addons').value,
+                message: messageTextarea.value.trim(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'new'
+            };
+
+            // Save to Firebase
+            await db.collection('appointments').add(formData);
+
             // Show success message
-            showSuccessMessage();
-            
+            showSuccessMessage('Thank you! Your appointment request has been submitted successfully. We\'ll contact you soon!');
+
             // Reset form
             form.reset();
-            
+
+            // Reset price calculator
+            const selectedOptions = document.querySelectorAll('.multiselect-option.selected');
+            selectedOptions.forEach(option => option.classList.remove('selected'));
+            document.getElementById('addons').value = '';
+            // Reset selected addons set and update calculator
+            if (typeof window.resetPriceCalculator === 'function') {
+                window.resetPriceCalculator();
+            }
+
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            showErrorMessage('Sorry, there was an error submitting your request. Please try calling us directly at (702)-378-6944.');
+        } finally {
             // Reset button
             submitButton.textContent = originalText;
             submitButton.disabled = false;
             submitButton.setAttribute('aria-busy', 'false');
-            
+
             // Reset input styles
             const inputs = form.querySelectorAll('input, select, textarea');
             inputs.forEach(input => {
                 input.style.borderColor = '';
                 input.removeAttribute('aria-invalid');
             });
-        }, 2000);
+        }
     }
 
-    function showSuccessMessage() {
+    function showSuccessMessage(message = 'Thank you! We\'ll get back to you soon.') {
         const successMessage = document.createElement('div');
         successMessage.className = 'success-message';
         successMessage.setAttribute('role', 'alert');
@@ -280,17 +307,52 @@ function initFormValidation() {
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
             z-index: 1001;
             animation: slideIn 0.3s ease;
+            max-width: 400px;
         `;
-        successMessage.textContent = 'Thank you! We\'ll get back to you soon.';
-        
+        successMessage.textContent = message;
+
         document.body.appendChild(successMessage);
-        
+
         setTimeout(() => {
             successMessage.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => {
-                document.body.removeChild(successMessage);
+                if (document.body.contains(successMessage)) {
+                    document.body.removeChild(successMessage);
+                }
             }, 300);
-        }, 3000);
+        }, 5000);
+    }
+
+    function showErrorMessage(message = 'Sorry, there was an error. Please try again.') {
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'error-message-popup';
+        errorMessage.setAttribute('role', 'alert');
+        errorMessage.setAttribute('aria-live', 'assertive');
+        errorMessage.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        `;
+        errorMessage.textContent = message;
+
+        document.body.appendChild(errorMessage);
+
+        setTimeout(() => {
+            errorMessage.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                if (document.body.contains(errorMessage)) {
+                    document.body.removeChild(errorMessage);
+                }
+            }, 300);
+        }, 7000);
     }
 }
 
@@ -566,11 +628,23 @@ function initPriceCalculator() {
     // Initial calculation
     updatePriceCalculator();
 
-    // Expose function for external use (pricing links)
+    // Expose functions for external use
     window.selectAddon = function(addonValue) {
         const option = addonsContainer.querySelector(`[data-value="${addonValue}"]`);
         if (option && !option.classList.contains('selected')) {
             option.click(); // This will trigger the selection and price update
         }
+    };
+
+    window.resetPriceCalculator = function() {
+        // Clear selected addons
+        selectedAddons.clear();
+
+        // Remove selected class from all options
+        const allOptions = addonsContainer.querySelectorAll('.multiselect-option');
+        allOptions.forEach(option => option.classList.remove('selected'));
+
+        // Update the calculator
+        updatePriceCalculator();
     };
 }

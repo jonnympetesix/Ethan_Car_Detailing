@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Hansen Mobile Detailing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>Hansen Mobile Detailing</h1>
+                <h2>Admin Panel</h2>
+            </div>
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <input type="password" id="admin-password" placeholder="Enter Admin Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <div id="login-error" class="error-message" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="dashboard-container" style="display: none;">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1>Hansen Mobile Detailing - Admin Dashboard</h1>
+                <div class="header-actions">
+                    <span id="last-updated" class="last-updated">Last updated: --</span>
+                    <button id="refresh-btn" class="btn btn-secondary">Refresh</button>
+                    <button id="logout-btn" class="btn btn-outline">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Statistics Cards -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-content">
+                        <h3 id="total-bookings">0</h3>
+                        <p>Total Bookings</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-content">
+                        <h3 id="pending-bookings">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <h3 id="confirmed-bookings">0</h3>
+                        <p>Confirmed</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-content">
+                        <h3 id="estimated-revenue">$0</h3>
+                        <p>Est. Revenue</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters and Controls -->
+        <section class="controls-section">
+            <div class="controls-container">
+                <div class="filter-group">
+                    <label for="status-filter">Filter by Status:</label>
+                    <select id="status-filter">
+                        <option value="all">All Bookings</option>
+                        <option value="new">New</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="date-filter">Filter by Date:</label>
+                    <select id="date-filter">
+                        <option value="all">All Time</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <input type="text" id="search-input" placeholder="Search by name, email, or phone...">
+                </div>
+            </div>
+        </section>
+
+        <!-- Bookings Table -->
+        <section class="bookings-section">
+            <div class="section-header">
+                <h2>Recent Bookings</h2>
+                <div class="real-time-indicator">
+                    <span class="status-dot" id="connection-status"></span>
+                    <span id="connection-text">Connecting...</span>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="bookings-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Contact</th>
+                            <th>Service</th>
+                            <th>Add-ons</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-tbody">
+                        <tr class="loading-row">
+                            <td colspan="7" class="loading-cell">
+                                <div class="loading-spinner"></div>
+                                Loading bookings...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Booking Detail Modal -->
+    <div id="booking-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Booking Details</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Booking details will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button id="save-booking" class="btn btn-primary">Save Changes</button>
+                <button id="cancel-modal" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Firebase Configuration -->
+    <script>
+        // Firebase configuration (same as main site)
+        const firebaseConfig = {
+            apiKey: "AIzaSyChexsv7JTdZz7QqFdkSrvuLd_CvuxNqU",
+            authDomain: "ethanbac-98eb6.firebaseapp.com",
+            projectId: "ethanbac-98eb6",
+            storageBucket: "ethanbac-98eb6.firebasestorage.app",
+            messagingSenderId: "942686119453",
+            appId: "1:942686119453:web:75756a4c32d0fbd025f4",
+            measurementId: "G-7E53J6W3P8"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        window.db = firebase.firestore();
+    </script>
+
+    <script src="admin.js"></script>
+</body>
+</html>
