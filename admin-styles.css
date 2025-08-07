@@ -156,6 +156,30 @@ body {
     font-weight: 500;
 }
 
+/* Rating Card Link Styling */
+.rating-card {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.rating-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.rating-card:hover .stat-icon {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.rating-card:hover .stat-content h3 {
+    color: #667eea;
+}
+
+.rating-card:hover .stat-content p {
+    color: #667eea;
+}
+
 /* Controls Section */
 .controls-section {
     max-width: 1200px;

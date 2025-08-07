@@ -501,8 +501,8 @@ html {
 
 .add-on-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
     margin-top: 60px;
 }
 
@@ -540,6 +540,7 @@ html {
     border-radius: 12px;
     border-left: 4px solid var(--accent-color);
     transition: all 0.3s ease;
+    text-align: center;
 }
 
 .add-on-item:hover {
@@ -557,24 +558,13 @@ html {
 }
 
 .add-on-item p {
-    color: var(--text-secondary);
-    margin: 0;
-    font-weight: 500;
-}
-
-.pricing-link {
     color: var(--accent-color);
-    cursor: pointer;
-    text-decoration: underline;
-    transition: all 0.3s ease;
-}
-
-.pricing-link:hover {
-    color: #2980b9;
-    text-decoration: none;
+    margin: 0;
     font-weight: 600;
+    font-size: 1rem;
 }
 
+/* Pricing links - only interactive for main services */
 .service-price .pricing-link {
     color: inherit;
     text-decoration: none;
@@ -586,6 +576,8 @@ html {
     color: var(--accent-color);
     text-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
 }
+
+
 
 /* Form Labels */
 .form-group label {
@@ -863,6 +855,28 @@ html {
     border-radius: 1rem;
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border-color);
+}
+
+/* Rating link styling */
+.rating-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.rating-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.15);
+    border-color: var(--accent-color);
+}
+
+.rating-link:hover .stat-number {
+    color: var(--accent-color);
+}
+
+.rating-link:hover .stat-label {
+    color: var(--accent-color);
 }
 
 .stat-number {

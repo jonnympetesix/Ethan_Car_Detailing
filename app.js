@@ -475,26 +475,26 @@ preloadResources();
 function initPricingLinks() {
     const pricingLinks = document.querySelectorAll('.pricing-link');
 
-    // Define which services are main services vs add-ons
+    // Define which services are main services (only main services are interactive now)
     const mainServices = ['premium-exterior', 'interior-detail', 'sedan-full', 'mid-size-suv-full', 'truck-full', 'suv-full'];
-    const addonServices = ['ceramic-coat', 'clay-bar', 'headlight-restoration', 'carpet-shampoo', 'seat-shampoo', 'pet-hair-removal', 'stain-removal'];
 
     pricingLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            const serviceValue = this.getAttribute('data-service');
+        const serviceValue = link.getAttribute('data-service');
 
-            // Scroll to contact form
-            const contactSection = document.getElementById('contact');
-            const offsetTop = contactSection.offsetTop - 70; // Account for fixed navbar
+        // Only add click functionality to main services
+        if (mainServices.includes(serviceValue)) {
+            link.addEventListener('click', function() {
+                // Scroll to contact form
+                const contactSection = document.getElementById('contact');
+                const offsetTop = contactSection.offsetTop - 70; // Account for fixed navbar
 
-            window.scrollTo({
-                top: offsetTop,
-                behavior: 'smooth'
-            });
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
 
-            // Pre-select the service after a short delay to ensure the scroll completes
-            setTimeout(() => {
-                if (mainServices.includes(serviceValue)) {
+                // Pre-select the service after a short delay to ensure the scroll completes
+                setTimeout(() => {
                     // Handle main service selection
                     const serviceSelect = document.getElementById('service');
                     if (serviceSelect && serviceValue) {
@@ -514,27 +514,9 @@ function initPricingLinks() {
                             serviceSelect.style.boxShadow = '';
                         }, 2000);
                     }
-                } else if (addonServices.includes(serviceValue)) {
-                    // Handle add-on service selection using the exposed function
-                    if (typeof window.selectAddon === 'function') {
-                        window.selectAddon(serviceValue);
-
-                        // Add visual feedback to the container
-                        const addonsContainer = document.getElementById('addons-multiselect');
-                        if (addonsContainer) {
-                            addonsContainer.style.borderColor = '#10b981';
-                            addonsContainer.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
-
-                            // Remove visual feedback after 2 seconds
-                            setTimeout(() => {
-                                addonsContainer.style.borderColor = '';
-                                addonsContainer.style.boxShadow = '';
-                            }, 2000);
-                        }
-                    }
-                }
-            }, 800);
-        });
+                }, 800);
+            });
+        }
     });
 }
 

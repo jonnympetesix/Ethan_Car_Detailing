@@ -7,7 +7,7 @@ class AdminPanel {
         this.unsubscribe = null;
         
         // Admin password (in production, use proper authentication)
-        this.adminPassword = 'hansen2024admin';
+        this.adminPassword = 'Hansen2025';
         
         this.init();
     }
