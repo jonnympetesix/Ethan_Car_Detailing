@@ -529,15 +529,8 @@ function initPriceCalculator() {
     const addonsPriceLine = document.querySelector('.addons-price');
     const totalPriceLine = document.querySelector('.total-price');
 
-    // Service prices mapping
-    const servicePrices = {
-        'premium-exterior': 150,
-        'interior-detail': 150,
-        'sedan-full': 200,
-        'mid-size-suv-full': 225,
-        'truck-full': 250,
-        'suv-full': 275
-    };
+    // Use centralized pricing configuration
+    const servicePrices = window.PricingConfig.services;
 
     // Track selected add-ons
     let selectedAddons = new Set();

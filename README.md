@@ -15,7 +15,7 @@ A professional mobile car detailing website for Hansen Mobile Detailing, serving
 ## Services Offered
 
 ### Main Packages
-- Premium Exterior Detail - $150
+- Premium Exterior Detail - $50
 - Interior Detail - $150
 - Sedan Full Detail - $200
 - Mid-Size SUV Full Detail - $225

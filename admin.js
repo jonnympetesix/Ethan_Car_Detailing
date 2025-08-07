@@ -157,8 +157,9 @@ class AdminPanel {
     }
 
     calculateBookingValue(booking) {
-        const servicePrices = {
-            'premium-exterior': 150,
+        // Use centralized pricing configuration
+        const servicePrices = window.PricingConfig ? window.PricingConfig.services : {
+            'premium-exterior': 50,
             'interior-detail': 150,
             'sedan-full': 200,
             'mid-size-suv-full': 225,
@@ -168,12 +169,14 @@ class AdminPanel {
             'quote': 0
         };
 
-        const addonPrices = {
+        // Use centralized addon pricing configuration
+        const addonPrices = window.PricingConfig ? window.PricingConfig.addons : {
             'ceramic-coat': 25,
             'clay-bar': 50,
-            'headlight-restoration': 75,
-            'engine-bay': 75,
-            'pet-hair': 50,
+            'headlight-restoration': 50,
+            'carpet-shampoo': 50,
+            'seat-shampoo': 50,
+            'pet-hair-removal': 50,
             'stain-removal': 50
         };
 
@@ -278,6 +281,12 @@ class AdminPanel {
     }
 
     formatServiceName(service) {
+        // Use centralized service names if available
+        if (window.PricingConfig && window.PricingConfig.getServiceName) {
+            return window.PricingConfig.getServiceName(service);
+        }
+
+        // Fallback service names
         const serviceNames = {
             'premium-exterior': 'Premium Exterior',
             'interior-detail': 'Interior Detail',
