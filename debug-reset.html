@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Reset Button</title>
+</head>
+<body>
+    <h1>Debug Reset Button</h1>
+    
+    <button id="reset-monday-friday">Reset to Monday-Friday</button>
+    <button id="test-button">Test Button</button>
+    
+    <div id="output"></div>
+    
+    <script>
+        function log(message) {
+            console.log(message);
+            document.getElementById('output').innerHTML += '<p>' + message + '</p>';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            log('DOM loaded');
+            
+            // Test if button exists
+            const resetBtn = document.getElementById('reset-monday-friday');
+            const testBtn = document.getElementById('test-button');
+            
+            log('Reset button found: ' + (resetBtn ? 'YES' : 'NO'));
+            log('Test button found: ' + (testBtn ? 'YES' : 'NO'));
+            
+            // Add simple click handlers
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    log('Reset button clicked!');
+                    alert('Reset button works!');
+                });
+                log('Reset button event listener added');
+            }
+            
+            if (testBtn) {
+                testBtn.addEventListener('click', function() {
+                    log('Test button clicked!');
+                    alert('Test button works!');
+                });
+                log('Test button event listener added');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -82,6 +82,8 @@ class AdminPanel {
         });
 
         document.getElementById('reset-monday-friday').addEventListener('click', () => {
+            console.log('=== RESET BUTTON CLICKED ===');
+            alert('Reset button clicked! Check console for details.');
             this.resetToMondayFriday();
         });
 
@@ -965,10 +967,43 @@ class AdminPanel {
     }
 
     resetToMondayFriday() {
+        console.log('=== resetToMondayFriday method called ===');
+        console.log('DateAvailabilityConfig available:', !!window.DateAvailabilityConfig);
+
         if (confirm('This will reset all available dates to Monday-Friday for the next 90 days. Any custom date selections will be lost. Continue?')) {
+            console.log('User confirmed reset. Starting Monday-Friday reset...');
+
+            if (!window.DateAvailabilityConfig) {
+                console.error('DateAvailabilityConfig not available!');
+                alert('Error: DateAvailabilityConfig not loaded. Please refresh the page.');
+                return;
+            }
+
             const newDates = window.DateAvailabilityConfig.resetToMondayFriday();
+            console.log('Reset completed. New dates count:', newDates ? newDates.length : 'undefined');
+
+            // Force a complete calendar refresh for both calendars
+            console.log('Forcing calendar refresh...');
+            if (this.adminCalendar) {
+                console.log('Refreshing admin calendar (Calendar tab)...');
+                this.adminCalendar.setSelectedDates(newDates);
+                this.adminCalendar.render();
+                this.updateSelectedCount();
+            }
+
+            if (this.adminBookingCalendar) {
+                console.log('Refreshing admin booking calendar (Table tab)...');
+                this.adminBookingCalendar.render();
+            }
+
+            // Also refresh stats and other components
             this.refreshCalendarAndStats();
-            alert(`Available dates reset to Monday-Friday. ${newDates.length} dates are now available.`);
+
+            // Force a page reload to ensure everything updates
+            setTimeout(() => {
+                alert(`Available dates reset to Monday-Friday. ${newDates.length} dates are now available. Page will refresh to show changes.`);
+                window.location.reload();
+            }, 500);
         }
     }
 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Calendar to Monday-Friday</title>
+</head>
+<body>
+    <h1>Calendar Reset Tool</h1>
+    <p>This tool will reset the calendar availability to Monday-Friday.</p>
+    
+    <button id="check-current" style="padding: 10px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px;">Check Current Dates</button>
+    <button id="reset-calendar" style="padding: 10px; margin: 5px; background: #dc3545; color: white; border: none; border-radius: 5px;">Reset to Monday-Friday</button>
+    <button id="clear-all" style="padding: 10px; margin: 5px; background: #6c757d; color: white; border: none; border-radius: 5px;">Clear All Data</button>
+    
+    <div id="output" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
+        <p>Click a button above to see results...</p>
+    </div>
+
+    <script src="day-availability-config.js"></script>
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(message) {
+            output.innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+        
+        function clearOutput() {
+            output.innerHTML = '';
+        }
+        
+        document.getElementById('check-current').addEventListener('click', () => {
+            clearOutput();
+            log('=== CHECKING CURRENT DATES ===');
+            
+            const availableDates = window.DateAvailabilityConfig.getAvailableDates();
+            log('Total available dates: ' + availableDates.length);
+            
+            if (availableDates.length > 0) {
+                log('First 10 dates: ' + availableDates.slice(0, 10).join(', '));
+                
+                // Check pattern of first week
+                const firstWeekDays = [];
+                for (let i = 0; i < Math.min(7, availableDates.length); i++) {
+                    const date = new Date(availableDates[i] + 'T00:00:00');
+                    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    firstWeekDays.push(dayNames[date.getDay()]);
+                }
+                log('Days of week pattern: ' + firstWeekDays.join(', '));
+            } else {
+                log('No available dates found!');
+            }
+            
+            const bookedDates = window.DateAvailabilityConfig.getBookedDates();
+            log('Booked dates: ' + bookedDates.length);
+        });
+        
+        document.getElementById('reset-calendar').addEventListener('click', () => {
+            clearOutput();
+            log('=== RESETTING TO MONDAY-FRIDAY ===');
+            
+            try {
+                const newDates = window.DateAvailabilityConfig.resetToMondayFriday();
+                log('Reset successful! Generated ' + newDates.length + ' dates');
+                
+                // Check the pattern
+                const firstWeekDays = [];
+                for (let i = 0; i < Math.min(7, newDates.length); i++) {
+                    const date = new Date(newDates[i] + 'T00:00:00');
+                    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    firstWeekDays.push(dayNames[date.getDay()]);
+                }
+                log('New pattern: ' + firstWeekDays.join(', '));
+                log('First 5 dates: ' + newDates.slice(0, 5).join(', '));
+                
+                log('<strong>SUCCESS! Now refresh your admin and customer pages.</strong>');
+            } catch (error) {
+                log('ERROR: ' + error.message);
+            }
+        });
+        
+        document.getElementById('clear-all').addEventListener('click', () => {
+            if (confirm('This will clear ALL calendar data. Are you sure?')) {
+                clearOutput();
+                log('=== CLEARING ALL DATA ===');
+                
+                localStorage.removeItem('availableDates');
+                localStorage.removeItem('bookedDates');
+                localStorage.removeItem('bookingCapacity');
+                
+                log('All localStorage data cleared!');
+                log('Refresh the page to regenerate default dates.');
+            }
+        });
+    </script>
+</body>
+</html>

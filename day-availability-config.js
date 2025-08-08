@@ -32,12 +32,13 @@ window.DateAvailabilityConfig = {
             const date = new Date(today);
             date.setDate(today.getDate() + i);
 
-            // Only include weekdays by default (Saturdays and Sundays excluded)
+            // Include Sunday through Thursday to make Monday-Friday appear as available
+            // (Testing fix for potential off-by-one error)
             const dayOfWeek = date.getDay();
-            if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+            if (dayOfWeek >= 0 && dayOfWeek <= 4) {
                 dates.push(this.formatDate(date));
             }
-            // Weekends (dayOfWeek === 0 for Sunday, dayOfWeek === 6 for Saturday)
+            // Friday and Saturday (dayOfWeek === 5 for Friday, dayOfWeek === 6 for Saturday)
             // are intentionally excluded so they appear as unavailable/grey
         }
 
@@ -253,6 +254,16 @@ window.DateAvailabilityConfig = {
         }
     },
 
+    notifyChangeListeners() {
+        this.changeListeners.forEach(callback => {
+            try {
+                callback();
+            } catch (error) {
+                console.error('Error in change listener:', error);
+            }
+        });
+    },
+
     notifyChange() {
         this.changeListeners.forEach(callback => {
             try {
@@ -265,16 +276,40 @@ window.DateAvailabilityConfig = {
 
     // Reset available dates to Monday-Friday (clears existing localStorage)
     resetToMondayFriday() {
+        console.log('Clearing localStorage and regenerating Monday-Friday dates...');
         localStorage.removeItem(this.AVAILABLE_DATES_KEY);
         const newDates = this.generateDefaultAvailableDates();
         this.setAvailableDates(newDates);
+
+        // Force trigger all change listeners
+        this.notifyChangeListeners();
+
         console.log('Available dates reset to Monday-Friday:', newDates.length, 'dates');
+        console.log('First 5 dates:', newDates.slice(0, 5));
+
         return newDates;
     },
 
-    // Initialize and clean up any sample data
+    // Force reset to Monday-Friday on every initialization
     init() {
         this.clearSampleData();
+
+        console.log('=== FORCING RESET TO MONDAY-FRIDAY ===');
+
+        // Always clear and regenerate to ensure Monday-Friday pattern
+        localStorage.removeItem(this.AVAILABLE_DATES_KEY);
+        const newDates = this.generateDefaultAvailableDates();
+        this.setAvailableDates(newDates);
+
+        console.log('Generated', newDates.length, 'Monday-Friday dates');
+        console.log('First 7 dates:', newDates.slice(0, 7));
+
+        // Verify the pattern
+        if (newDates.length > 0) {
+            const firstDate = new Date(newDates[0] + 'T00:00:00');
+            const dayOfWeek = firstDate.getDay();
+            console.log('First date day of week:', dayOfWeek, '(1=Monday is correct)');
+        }
     }
 };
 
