@@ -3,16 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hansen Mobile Detailing - Premium Car Care Services</title>
+    <title>Hansen's Mobile Detailing - Premium Car Care Services</title>
     <meta name="description" content="Professional mobile car detailing services. We come to you! Premium interior and exterior detailing, paint correction, ceramic coating, and more.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2">
     <link rel="icon" type="image/png" href="photos/Favicon.PNG">
 
+    <!-- Calendar-specific styles -->
+    <style>
+        /* Calendar Container Styles */
+        .calendar-container {
+            margin: 15px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Selected Date Display */
+        .selected-date-info {
+            margin: 15px 0;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 8px;
+            border: 1px solid #cbd5e0;
+            text-align: center;
+        }
+
+        #selected-date-text {
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        /* Hide the old date input when calendar is active */
+        .form-group input[type="date"] {
+            display: none;
+        }
+
+        /* Loading message */
+        .loading-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+            font-style: italic;
+        }
+
+        /* Error message */
+        .error-message {
+            text-align: center;
+            padding: 20px;
+            color: #e53e3e;
+            background-color: #fed7d7;
+            border: 1px solid #feb2b2;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+
     <!-- Pricing Configuration -->
-    <script src="pricing-config.js"></script>
+    <script src="pricing-config.js?v=2"></script>
 
     <!-- SEO and Social Media Meta Tags -->
     <meta property="og:title" content="Hansen Mobile Detailing - Premium Car Care Services">
@@ -93,7 +144,7 @@
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <h2>Hansen Mobile Detailing</h2>
+                <h2>Hansen's Mobile Detailing</h2>
             </div>
             <ul class="nav-menu" id="nav-menu">
                 <li class="nav-item">
@@ -152,7 +203,7 @@
             <div class="services-grid">
                 <div class="service-card">
                     <div class="service-image">
-                        <img src="photos/IMG_6667.jpg" alt="Sedan Full Detail - Professional car detailing service" class="service-photo">
+                        <img src="photos/IMG_8237.jpg" alt="Sedan Full Detail - Professional car detailing service" class="service-photo">
                     </div>
                     <h3>Sedan Full Detail</h3>
                     <p>This interior and exterior detail package will transform your vehicle back to like-new!</p>
@@ -397,7 +448,7 @@
                 </div>
                 <div class="about-stats">
                     
-                    <a href="https://www.google.com/search?q=Hansen%27s+Mobile+Detailing&stick=H4sIAAAAAAAA_-NgU1I1qLAwNDVKSTaztEhKMjQxSE2zMqgwSU5MsTBLszBIMzYzNjMzXsQq6ZGYV5yap16s4JuflJmTquCSWpKYmZOZlw4Ae8UB0EUAAAA&hl=en&mat=CbXD_0keSxRKElcBmzl_pY2N2pW_uwpNMUD07E8fLFDH_l-vFm_3oQvEFiB1Qm_jjEIqLS4yXGjnSElHB4BJRErgEN_hfkJ4gPVdGKkwYU5XSR1xLM5wv6khNwZwgVsjFXQ&authuser=0" target="_blank" rel="noopener noreferrer" class="stat rating-link">
+                    <a href="https://www.google.com/search?q=Hansen%27s+Mobile+Detailing&stick=H4sIAAAAAAAA_-NgU1I1qLAwNDVKSTaztEhKMjQxSE2zMqgwSU5MsTBLszBIMzYzNjMzXsQq6ZGYV5yap16s4JuflJmTquCSWpKYmZOZlw4Ae8UB0EUAAAA&hl=en&mat=CbXD_0keSxRKElcBYJahab876QgVm65gxV-ppFi9tpF-xvqc9loTPZObnsI1OKBfDnfVqOmNAfltR4TuGT1i8gIpkLO_tzAmCjY8VXb7lt2eHPGgkqOOSVXSfej-Xm6VIA0&authuser=0#mpd=~5337974051803481013/customers/reviews" target="_blank" rel="noopener noreferrer" class="stat rating-link">
                         <div class="stat-number">5★</div>
                         <div class="stat-label">
                             <svg class="google-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -468,6 +519,27 @@
                     </div>
                     <div class="form-group">
                         <input type="tel" id="phone" name="phone" placeholder="Your Phone">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="address" name="address" placeholder="Service Address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="service-date">Preferred Service Date *</label>
+                        <input type="hidden" id="service-date" name="service-date" required>
+
+                        <!-- Calendar Component -->
+                        <div id="customer-calendar" class="calendar-container">
+                            <div class="loading-message">Loading calendar...</div>
+                        </div>
+
+                        <!-- Selected Date Display -->
+                        <div id="selected-date-display" class="selected-date-info">
+                            <span id="selected-date-text">Please select a date from the calendar above</span>
+                        </div>
+
+                        <div id="available-days-info" class="form-help-text">
+                            Available days: <span id="available-days-list">Monday - Friday</span>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="service">Main Service Package *</label>
@@ -576,6 +648,110 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Date Availability Configuration -->
+    <script src="day-availability-config.js?v=7" defer></script>
+
+    <!-- Calendar Component -->
+    <link rel="stylesheet" href="calendar-component.css?v=7">
+    <script src="calendar-component.js?v=7" defer></script>
+
+    <!-- Customer Calendar Initialization -->
+    <script>
+        // Initialize customer calendar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, starting calendar initialization...');
+            let customerCalendar = null;
+            let retryCount = 0;
+            const maxRetries = 50; // 5 seconds max
+
+            // Wait for DateAvailabilityConfig to be available
+            function initializeCustomerCalendar() {
+                console.log('Checking dependencies... (attempt', retryCount + 1, ')');
+                console.log('DateAvailabilityConfig:', !!window.DateAvailabilityConfig);
+                console.log('CalendarComponent:', !!window.CalendarComponent);
+
+                if (!window.DateAvailabilityConfig || !window.CalendarComponent) {
+                    retryCount++;
+                    if (retryCount >= maxRetries) {
+                        console.error('Failed to load calendar dependencies after', maxRetries, 'attempts');
+                        const container = document.getElementById('customer-calendar');
+                        if (container) {
+                            container.innerHTML = '<div class="error-message">Failed to load calendar. Please refresh the page.</div>';
+                        }
+                        return;
+                    }
+                    console.log('Dependencies not ready, retrying in 100ms...');
+                    setTimeout(initializeCustomerCalendar, 100);
+                    return;
+                }
+
+                console.log('Dependencies ready, initializing calendar...');
+
+                // Check if container exists
+                const container = document.getElementById('customer-calendar');
+                if (!container) {
+                    console.error('Calendar container not found!');
+                    return;
+                }
+
+                console.log('Container found:', container);
+                console.log('Available dates:', window.DateAvailabilityConfig.getAvailableDates());
+                console.log('Booked dates:', window.DateAvailabilityConfig.getBookedDates());
+
+                try {
+                    customerCalendar = new CalendarComponent('customer-calendar', {
+                        selectable: true,
+                        multiSelect: false,
+                        onDateSelect: (dateString) => {
+                            console.log('Date selected:', dateString);
+
+                            // Double-check if date is actually available
+                            if (!window.DateAvailabilityConfig.isDateAvailable(dateString)) {
+                                alert('This date is not available for booking.');
+                                return;
+                            }
+
+                            // Update hidden input for form submission
+                            document.getElementById('service-date').value = dateString;
+
+                            // Update display
+                            const date = window.DateAvailabilityConfig.parseDate(dateString);
+                            const displayText = date.toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            });
+                            document.getElementById('selected-date-text').textContent = displayText;
+
+                            // Remove any existing validation errors
+                            const dateInput = document.getElementById('service-date');
+                            const formGroup = dateInput.closest('.form-group');
+                            const existingError = formGroup.querySelector('.error-message');
+                            if (existingError) {
+                                existingError.remove();
+                            }
+                        }
+                    });
+
+                    console.log('Calendar created successfully:', customerCalendar);
+
+                    // Listen for changes in availability and refresh calendar
+                    window.DateAvailabilityConfig.addChangeListener(() => {
+                        console.log('Date availability changed, refreshing calendar...');
+                        if (customerCalendar) {
+                            customerCalendar.render();
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error creating calendar:', error);
+                }
+            }
+
+            initializeCustomerCalendar();
+        });
+    </script>
 
     <!-- Dynamic Pricing Initialization -->
     <script>

@@ -8,10 +8,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="admin-styles.css?v=8">
 
     <!-- Pricing Configuration -->
     <script src="pricing-config.js"></script>
+
+    <!-- Date Availability Configuration -->
+    <script src="day-availability-config.js?v=14" defer></script>
+
+    <!-- Calendar Component -->
+    <link rel="stylesheet" href="calendar-component.css?v=12">
+    <script src="calendar-component.js?v=12" defer></script>
 </head>
 <body>
     <!-- Login Screen -->
@@ -109,6 +116,62 @@
             </div>
         </section>
 
+        <!-- Calendar View Section -->
+        <section class="calendar-view-section">
+            <div class="section-header">
+                <h2>Calendar Management</h2>
+                <div class="view-toggle">
+                    <button id="calendar-view-btn" class="btn btn-secondary active">Calendar</button>
+                    <button id="table-view-btn" class="btn btn-secondary">Table</button>
+                </div>
+            </div>
+
+            <!-- Calendar Controls -->
+            <div class="calendar-controls-bar">
+                <div class="control-group">
+                    <label>Daily Booking Capacity:</label>
+                    <select id="booking-capacity" class="form-control">
+                        <option value="1" selected>1 booking per day (Default)</option>
+                        <option value="2">2 bookings per day</option>
+                        <option value="3">3 bookings per day</option>
+                        <option value="4">4 bookings per day</option>
+                        <option value="5">5 bookings per day</option>
+                    </select>
+                    <small class="form-help-text">Note: Dates with ANY bookings will show as "Booked" regardless of capacity</small>
+                </div>
+                <div class="control-group">
+                    <button id="bulk-add-weekdays" class="btn btn-secondary btn-small">Add Next 30 Weekdays</button>
+                    <button id="clear-all-dates" class="btn btn-secondary btn-small">Clear All Availability</button>
+                </div>
+            </div>
+
+            <div id="calendar-view-container" class="calendar-view-container">
+                <div class="calendar-instructions">
+                    <p><strong>Instructions:</strong> Click ANY date (including grey unavailable ones) to manage it. Person icons show customer bookings. Look for the ⚙️ gear icon on hover.</p>
+                </div>
+                <div id="admin-booking-calendar" class="admin-booking-calendar"></div>
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <span class="legend-color available"></span>
+                        <span>Available</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color booked"></span>
+                        <span>Booked</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color unavailable"></span>
+                        <span>Unavailable</span>
+                    </div>
+                </div>
+                <div class="calendar-stats">
+                    <p><strong>Available dates:</strong> <span id="available-count">0</span> |
+                       <strong>Booked dates:</strong> <span id="booked-count">0</span> |
+                       <strong>Total bookings:</strong> <span id="total-bookings-count">0</span></p>
+                </div>
+            </div>
+        </section>
+
         <!-- Bookings Table -->
         <section class="bookings-section">
             <div class="section-header">
@@ -126,6 +189,7 @@
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Contact</th>
+                            <th>Address</th>
                             <th>Service</th>
                             <th>Add-ons</th>
                             <th>Status</th>
@@ -162,6 +226,8 @@
         </div>
     </div>
 
+
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -186,6 +252,6 @@
         window.db = firebase.firestore();
     </script>
 
-    <script src="admin.js"></script>
+    <script src="admin.js?v=10"></script>
 </body>
 </html>
