@@ -118,6 +118,8 @@ function initFormValidation() {
     const nameInput = document.getElementById('name');
     const emailInput = document.getElementById('email');
     const phoneInput = document.getElementById('phone');
+    const addressInput = document.getElementById('address');
+    const serviceDateInput = document.getElementById('service-date');
     const serviceSelect = document.getElementById('service');
     const messageTextarea = document.getElementById('message');
 
@@ -132,6 +134,14 @@ function initFormValidation() {
 
     phoneInput.addEventListener('blur', function() {
         validatePhone(this);
+    });
+
+    addressInput.addEventListener('blur', function() {
+        validateAddress(this);
+    });
+
+    serviceDateInput.addEventListener('change', function() {
+        validateServiceDate(this);
     });
 
     serviceSelect.addEventListener('change', function() {
@@ -190,13 +200,51 @@ function initFormValidation() {
         return true;
     }
 
+    function validateAddress(input) {
+        const value = input.value.trim();
+        if (value.length < 5) {
+            showError(input, 'Please enter a complete address');
+            return false;
+        }
+        showSuccess(input);
+        return true;
+    }
+
+    function validateServiceDate(input) {
+        const value = input.value;
+        if (!value) {
+            showError(input, 'Please select a service date from the calendar');
+            return false;
+        }
+
+        // Check if the date is available using the new system
+        if (window.DateAvailabilityConfig && !window.DateAvailabilityConfig.isDateAvailable(value)) {
+            showError(input, 'Selected date is not available. Please choose an available date from the calendar.');
+            return false;
+        }
+
+        const selectedDate = new Date(value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+            showError(input, 'Service date cannot be in the past');
+            return false;
+        }
+
+        showSuccess(input);
+        return true;
+    }
+
     function validateForm() {
         const nameValid = validateName(nameInput);
         const emailValid = validateEmail(emailInput);
         const phoneValid = validatePhone(phoneInput);
+        const addressValid = validateAddress(addressInput);
+        const serviceDateValid = validateServiceDate(serviceDateInput);
         const serviceValid = validateService(serviceSelect);
-        
-        return nameValid && emailValid && phoneValid && serviceValid;
+
+        return nameValid && emailValid && phoneValid && addressValid && serviceDateValid && serviceValid;
     }
 
     function showError(input, message) {
@@ -248,6 +296,8 @@ function initFormValidation() {
                 name: nameInput.value.trim(),
                 email: emailInput.value.trim(),
                 phone: phoneInput.value.trim(),
+                address: document.getElementById('address').value.trim(),
+                serviceDate: document.getElementById('service-date').value,
                 service: serviceSelect.value,
                 addons: document.getElementById('addons').value,
                 message: messageTextarea.value.trim(),
@@ -257,6 +307,11 @@ function initFormValidation() {
 
             // Save to Firebase
             await db.collection('appointments').add(formData);
+
+            // Mark the date as booked (only one service per day)
+            if (window.DateAvailabilityConfig && formData.serviceDate) {
+                window.DateAvailabilityConfig.addBookedDate(formData.serviceDate);
+            }
 
             // Show success message
             showSuccessMessage('Thank you! Your appointment request has been submitted successfully. We\'ll contact you soon!');
