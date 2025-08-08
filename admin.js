@@ -81,6 +81,10 @@ class AdminPanel {
             this.bulkAddWeekdays();
         });
 
+        document.getElementById('reset-monday-friday').addEventListener('click', () => {
+            this.resetToMondayFriday();
+        });
+
         document.getElementById('clear-all-dates').addEventListener('click', () => {
             this.clearAllDates();
         });
@@ -958,6 +962,14 @@ class AdminPanel {
         window.DateAvailabilityConfig.setAvailableDates(availableDates);
         this.refreshCalendarAndStats();
         alert(`Added ${addedCount} weekdays to available dates.`);
+    }
+
+    resetToMondayFriday() {
+        if (confirm('This will reset all available dates to Monday-Friday for the next 90 days. Any custom date selections will be lost. Continue?')) {
+            const newDates = window.DateAvailabilityConfig.resetToMondayFriday();
+            this.refreshCalendarAndStats();
+            alert(`Available dates reset to Monday-Friday. ${newDates.length} dates are now available.`);
+        }
     }
 
     clearAllDates() {

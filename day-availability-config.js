@@ -263,6 +263,15 @@ window.DateAvailabilityConfig = {
         });
     },
 
+    // Reset available dates to Monday-Friday (clears existing localStorage)
+    resetToMondayFriday() {
+        localStorage.removeItem(this.AVAILABLE_DATES_KEY);
+        const newDates = this.generateDefaultAvailableDates();
+        this.setAvailableDates(newDates);
+        console.log('Available dates reset to Monday-Friday:', newDates.length, 'dates');
+        return newDates;
+    },
+
     // Initialize and clean up any sample data
     init() {
         this.clearSampleData();
