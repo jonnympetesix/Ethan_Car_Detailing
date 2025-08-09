@@ -345,6 +345,21 @@ class AdminPanel {
         return addons.split(',').map(addon => addon.trim()).join(', ');
     }
 
+    formatTimeSlot(serviceTime) {
+        if (!serviceTime) return 'Not specified';
+
+        // Map time slot values to readable format
+        const timeSlotMap = {
+            '9:00-13:00': 'Morning: 9:00 AM - 1:00 PM',
+            '13:00-17:00': 'Afternoon: 1:00 PM - 5:00 PM',
+            // Legacy time slots for backward compatibility
+            '8:00-13:30': 'Morning: 8:00 AM - 1:30 PM',
+            '13:30-17:00': 'Afternoon: 1:30 PM - 5:00 PM'
+        };
+
+        return timeSlotMap[serviceTime] || serviceTime;
+    }
+
     updateLastUpdated() {
         const now = new Date();
         document.getElementById('last-updated').textContent =
@@ -426,6 +441,7 @@ class AdminPanel {
                     <p><strong>Phone:</strong> ${booking.phone || 'Not provided'}</p>
                     <p><strong>Address:</strong> ${booking.address || 'null'}</p>
                     <p><strong>Service Date:</strong> ${booking.serviceDate || 'Not specified'}</p>
+                    <p><strong>Time Slot:</strong> ${this.formatTimeSlot(booking.serviceTime)}</p>
                     <p><strong>Submitted:</strong> ${date.toLocaleString()}</p>
                 </div>
                 
@@ -563,14 +579,14 @@ class AdminPanel {
                 // Create booking indicator
                 const indicator = document.createElement('div');
                 indicator.className = 'booking-indicator';
-                indicator.title = `${bookingsForDate.length} booking(s)`;
+                indicator.title = `Click to view ${bookingsForDate.length} booking(s)`;
 
                 // Create tooltip
                 const tooltip = document.createElement('div');
                 tooltip.className = 'booking-tooltip';
                 tooltip.innerHTML = bookingsForDate.map(booking =>
                     `${booking.name} - ${this.formatServiceName(booking.service)}`
-                ).join('<br>');
+                ).join('<br>') + '<br><small><em>Click to view customer details</em></small>';
 
                 indicator.appendChild(tooltip);
                 dayElement.appendChild(indicator);
@@ -598,14 +614,20 @@ class AdminPanel {
             // Show single booking details
             this.viewBooking(bookingsForDate[0].id);
         } else {
-            // Show list of bookings for this date
-            const bookingList = bookingsForDate.map(booking =>
-                `• ${booking.name} - ${this.formatServiceName(booking.service)} (${booking.status || 'new'})`
+            // Show list of bookings for this date with better selection
+            const bookingList = bookingsForDate.map((booking, index) =>
+                `${index + 1}. ${booking.name} - ${this.formatServiceName(booking.service)} (${booking.status || 'new'})`
             ).join('\n');
 
-            const choice = confirm(`Multiple bookings on ${dateString}:\n\n${bookingList}\n\nClick OK to view the first booking, or Cancel to close.`);
-            if (choice) {
-                this.viewBooking(bookingsForDate[0].id);
+            const selection = prompt(`Multiple bookings on ${dateString}:\n\n${bookingList}\n\nEnter the number (1-${bookingsForDate.length}) of the booking you want to view, or click Cancel to close:`);
+
+            if (selection) {
+                const index = parseInt(selection) - 1;
+                if (index >= 0 && index < bookingsForDate.length) {
+                    this.viewBooking(bookingsForDate[index].id);
+                } else {
+                    alert('Invalid selection. Please enter a number between 1 and ' + bookingsForDate.length);
+                }
             }
         }
     }

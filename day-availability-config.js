@@ -32,14 +32,12 @@ window.DateAvailabilityConfig = {
             const date = new Date(today);
             date.setDate(today.getDate() + i);
 
-            // Include Sunday through Thursday to make Monday-Friday appear as available
-            // (Testing fix for potential off-by-one error)
+            // Include Monday through Friday as available days
             const dayOfWeek = date.getDay();
-            if (dayOfWeek >= 0 && dayOfWeek <= 4) {
+            if (dayOfWeek >= 1 && dayOfWeek <= 5) {
                 dates.push(this.formatDate(date));
             }
-            // Friday and Saturday (dayOfWeek === 5 for Friday, dayOfWeek === 6 for Saturday)
-            // are intentionally excluded so they appear as unavailable/grey
+            // Saturday (6) and Sunday (0) are excluded so they appear as unavailable/grey
         }
 
         // No sample bookings - dates should only appear booked when there are real appointments

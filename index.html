@@ -541,6 +541,17 @@
                             Available days: <span id="available-days-list">Monday - Friday</span>
                         </div>
                     </div>
+                    <div class="form-group" id="time-slot-group" style="display: none;">
+                        <label for="service-time">Preferred Time Slot *</label>
+                        <select id="service-time" name="service-time" required>
+                            <option value="">Select a time slot</option>
+                            <option value="9:00-13:00">Morning: 9:00 AM - 1:00 PM</option>
+                            <option value="13:00-17:00">Afternoon: 1:00 PM - 5:00 PM</option>
+                        </select>
+                        <div class="form-help-text">
+                            Available time slots will be shown based on your selected date.
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="service">Main Service Package *</label>
                         <select id="service" name="service" required>
@@ -649,8 +660,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
+    <!-- TimeSlot Manager (required by date-availability-config) -->
+    <script src="timeslot-calendar.js?v=7" defer></script>
+
     <!-- Date Availability Configuration -->
-    <script src="day-availability-config.js?v=7" defer></script>
+    <script src="date-availability-config.js?v=7" defer></script>
 
     <!-- Calendar Component -->
     <link rel="stylesheet" href="calendar-component.css?v=7">
@@ -696,6 +710,11 @@
                 }
 
                 console.log('Container found:', container);
+                // Clear old data and regenerate with correct Monday-Friday schedule
+                console.log('Clearing old calendar data and regenerating...');
+                localStorage.removeItem('availableDates');
+                localStorage.removeItem('bookedDates');
+
                 console.log('Available dates:', window.DateAvailabilityConfig.getAvailableDates());
                 console.log('Booked dates:', window.DateAvailabilityConfig.getBookedDates());
 
@@ -724,6 +743,39 @@
                                 day: 'numeric'
                             });
                             document.getElementById('selected-date-text').textContent = displayText;
+
+                            // Show and populate time slot selection
+                            const timeSlotGroup = document.getElementById('time-slot-group');
+                            const timeSlotSelect = document.getElementById('service-time');
+
+                            // Get available time slots for this date
+                            const dayData = window.TimeSlotManager ? window.TimeSlotManager.getDayData(dateString) : { bookedSlots: [] };
+                            const bookedSlots = dayData.bookedSlots || [];
+
+                            // Clear and repopulate time slot options
+                            timeSlotSelect.innerHTML = '<option value="">Select a time slot</option>';
+
+                            // Add morning slot if not booked
+                            if (!bookedSlots.includes('morning')) {
+                                const morningOption = document.createElement('option');
+                                morningOption.value = '9:00-13:00';
+                                morningOption.textContent = 'Morning: 9:00 AM - 1:00 PM';
+                                timeSlotSelect.appendChild(morningOption);
+                            }
+
+                            // Add afternoon slot if not booked
+                            if (!bookedSlots.includes('afternoon')) {
+                                const afternoonOption = document.createElement('option');
+                                afternoonOption.value = '13:00-17:00';
+                                afternoonOption.textContent = 'Afternoon: 1:00 PM - 5:00 PM';
+                                timeSlotSelect.appendChild(afternoonOption);
+                            }
+
+                            // Show the time slot group
+                            timeSlotGroup.style.display = 'block';
+
+                            // Make time slot required
+                            timeSlotSelect.required = true;
 
                             // Remove any existing validation errors
                             const dateInput = document.getElementById('service-date');
