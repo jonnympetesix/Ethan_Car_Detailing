@@ -120,6 +120,7 @@ function initFormValidation() {
     const phoneInput = document.getElementById('phone');
     const addressInput = document.getElementById('address');
     const serviceDateInput = document.getElementById('service-date');
+    const serviceTimeInput = document.getElementById('service-time');
     const serviceSelect = document.getElementById('service');
     const messageTextarea = document.getElementById('message');
 
@@ -142,6 +143,10 @@ function initFormValidation() {
 
     serviceDateInput.addEventListener('change', function() {
         validateServiceDate(this);
+    });
+
+    serviceTimeInput.addEventListener('change', function() {
+        validateServiceTime(this);
     });
 
     serviceSelect.addEventListener('change', function() {
@@ -187,6 +192,17 @@ function initFormValidation() {
             showError(input, 'Please enter a valid phone number');
             return false;
         }
+        showSuccess(input);
+        return true;
+    }
+
+    function validateServiceTime(input) {
+        const value = input.value;
+        if (!value) {
+            showError(input, 'Please select a preferred time slot');
+            return false;
+        }
+
         showSuccess(input);
         return true;
     }
@@ -242,9 +258,10 @@ function initFormValidation() {
         const phoneValid = validatePhone(phoneInput);
         const addressValid = validateAddress(addressInput);
         const serviceDateValid = validateServiceDate(serviceDateInput);
+        const serviceTimeValid = validateServiceTime(serviceTimeInput);
         const serviceValid = validateService(serviceSelect);
 
-        return nameValid && emailValid && phoneValid && addressValid && serviceDateValid && serviceValid;
+        return nameValid && emailValid && phoneValid && addressValid && serviceDateValid && serviceTimeValid && serviceValid;
     }
 
     function showError(input, message) {
@@ -298,6 +315,7 @@ function initFormValidation() {
                 phone: phoneInput.value.trim(),
                 address: document.getElementById('address').value.trim(),
                 serviceDate: document.getElementById('service-date').value,
+                serviceTime: document.getElementById('service-time').value,
                 service: serviceSelect.value,
                 addons: document.getElementById('addons').value,
                 message: messageTextarea.value.trim(),

@@ -131,8 +131,8 @@ class CalendarComponent {
             dayCell.dataset.date = dateString;
             
             // Determine day status
-            const bookingStatus = window.DateAvailabilityConfig.getDateBookingStatus(date);
-            const hasBookings = window.DateAvailabilityConfig.isDateBooked(date);
+            const bookingStatus = window.DateAvailabilityConfig.getDateBookingStatus(dateString);
+            const hasBookings = window.DateAvailabilityConfig.isDateBooked(dateString);
             const isPast = date < this.options.minDate;
             const isSelected = this.selectedDates.has(dateString);
 
@@ -177,7 +177,10 @@ class CalendarComponent {
             // Add admin click handler for availability management (all dates except past)
             if (this.options.adminMode && !isPast) {
                 dayCell.classList.add('admin-clickable');
+                console.log(`Adding admin click handler for ${dateString}, adminMode: ${this.options.adminMode}`);
+
                 dayCell.addEventListener('click', (e) => {
+                    console.log(`Admin date clicked: ${dateString}`);
                     // Prevent the regular date click if this is admin mode
                     e.stopPropagation();
                     e.preventDefault();
@@ -186,6 +189,10 @@ class CalendarComponent {
 
                 // Also add a visual indicator that it's clickable
                 dayCell.title = `Admin: Click to manage ${dateString}`;
+
+                // Add visual styling to make it obvious it's clickable
+                dayCell.style.cursor = 'pointer';
+                dayCell.style.border = '2px solid #3b82f6';
             }
             
             grid.appendChild(dayCell);
@@ -242,11 +249,16 @@ class CalendarComponent {
 
     handleAdminDateClick(dateString, dayCell) {
         console.log('handleAdminDateClick called for:', dateString);
+        console.log('Available callbacks:', Object.keys(this.options));
         if (this.options.onAdminDateClick) {
             console.log('Calling onAdminDateClick callback');
             this.options.onAdminDateClick(dateString, dayCell);
+        } else if (this.options.onDateClick) {
+            console.log('Falling back to onDateClick callback');
+            this.options.onDateClick(dateString, dayCell);
         } else {
-            console.log('No onAdminDateClick callback found');
+            console.log('No admin date click callback found');
+            console.log('Options:', this.options);
         }
     }
 }
