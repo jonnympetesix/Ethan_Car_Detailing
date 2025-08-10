@@ -11,12 +11,22 @@ class DateAvailabilityConfig {
         // Wait for both Firebase and TimeSlotManager to be ready
         const checkDependencies = () => {
             if (window.db && window.TimeSlotManager) {
+                this.initializeDefaultDates();
                 this.setupFirebaseListener();
             } else {
                 setTimeout(checkDependencies, 100);
             }
         };
         checkDependencies();
+    }
+
+    initializeDefaultDates() {
+        // Ensure TimeSlotManager has default Monday-Friday dates
+        const timeSlotData = window.TimeSlotManager.getAllData();
+        if (Object.keys(timeSlotData).length === 0) {
+            console.log('Initializing default Monday-Friday availability...');
+            this.resetToMondayFriday();
+        }
     }
 
     setupFirebaseListener() {

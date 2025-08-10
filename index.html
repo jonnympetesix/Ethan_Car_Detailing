@@ -710,10 +710,8 @@
                 }
 
                 console.log('Container found:', container);
-                // Clear old data and regenerate with correct Monday-Friday schedule
-                console.log('Clearing old calendar data and regenerating...');
-                localStorage.removeItem('availableDates');
-                localStorage.removeItem('bookedDates');
+                // Initialize with new system
+                console.log('Initializing calendar with new date availability system...');
 
                 console.log('Available dates:', window.DateAvailabilityConfig.getAvailableDates());
                 console.log('Booked dates:', window.DateAvailabilityConfig.getBookedDates());
