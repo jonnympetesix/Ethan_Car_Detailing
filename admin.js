@@ -777,24 +777,15 @@ class AdminPanel {
     }
 
     makeeDateAvailable(dateString) {
-        const availableDates = window.DateAvailabilityConfig.getAvailableDates();
-        if (!availableDates.includes(dateString)) {
-            availableDates.push(dateString);
-            availableDates.sort();
-            window.DateAvailabilityConfig.setAvailableDates(availableDates);
-        }
+        // Use the individual date method to avoid resetting other dates
+        window.DateAvailabilityConfig.addAvailableDate(dateString);
         this.refreshCalendarAndStats();
         alert('Date marked as available.');
     }
 
     makeDateUnavailable(dateString) {
-        // Remove from available dates
-        const availableDates = window.DateAvailabilityConfig.getAvailableDates();
-        const index = availableDates.indexOf(dateString);
-        if (index > -1) {
-            availableDates.splice(index, 1);
-            window.DateAvailabilityConfig.setAvailableDates(availableDates);
-        }
+        // Use the individual date method to avoid resetting other dates
+        window.DateAvailabilityConfig.removeAvailableDate(dateString);
 
         // Also remove any manual bookings for this date
         const bookedDates = window.DateAvailabilityConfig.getBookedDates();

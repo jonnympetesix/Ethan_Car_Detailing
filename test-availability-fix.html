@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Availability Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 3px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #status {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Availability Fix</h1>
+    <p>This test verifies that setting multiple dates to unavailable/available works correctly.</p>
+
+    <div class="test-section">
+        <h3>Current Status</h3>
+        <div id="status">Loading...</div>
+        <button onclick="refreshStatus()">Refresh Status</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Actions</h3>
+        <button onclick="testMultipleUnavailable()">Test: Set Multiple Dates Unavailable</button>
+        <button onclick="testMultipleAvailable()">Test: Set Multiple Dates Available</button>
+        <button onclick="resetToDefaults()">Reset to Defaults</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Results</h3>
+        <div id="results"></div>
+    </div>
+
+    <!-- Include required scripts -->
+    <script src="date-availability-config.js"></script>
+    <script src="timeslot-calendar.js"></script>
+
+    <script>
+        // Initialize the system
+        window.addEventListener('load', () => {
+            // Wait for dependencies to load
+            setTimeout(() => {
+                if (window.DateAvailabilityConfig && window.TimeSlotManager) {
+                    refreshStatus();
+                    addResult('System initialized successfully', 'success');
+                } else {
+                    addResult('Failed to initialize system', 'error');
+                }
+            }, 500);
+        });
+
+        function refreshStatus() {
+            if (!window.DateAvailabilityConfig) {
+                document.getElementById('status').innerHTML = 'DateAvailabilityConfig not loaded';
+                return;
+            }
+
+            const availableDates = window.DateAvailabilityConfig.getAvailableDates();
+            const totalDates = availableDates.length;
+            
+            document.getElementById('status').innerHTML = `
+                <strong>Available Dates:</strong> ${totalDates}<br>
+                <strong>Sample dates:</strong> ${availableDates.slice(0, 5).join(', ')}${totalDates > 5 ? '...' : ''}
+            `;
+        }
+
+        function addResult(message, type) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function testMultipleUnavailable() {
+            if (!window.DateAvailabilityConfig) {
+                addResult('DateAvailabilityConfig not available', 'error');
+                return;
+            }
+
+            // Get some available dates to test with
+            const availableDates = window.DateAvailabilityConfig.getAvailableDates();
+            if (availableDates.length < 3) {
+                addResult('Need at least 3 available dates for this test', 'error');
+                return;
+            }
+
+            const testDates = availableDates.slice(0, 3);
+            addResult(`Testing with dates: ${testDates.join(', ')}`, 'success');
+
+            // Set first date unavailable
+            window.DateAvailabilityConfig.removeAvailableDate(testDates[0]);
+            const afterFirst = window.DateAvailabilityConfig.getAvailableDates();
+            
+            // Set second date unavailable
+            window.DateAvailabilityConfig.removeAvailableDate(testDates[1]);
+            const afterSecond = window.DateAvailabilityConfig.getAvailableDates();
+
+            // Set third date unavailable
+            window.DateAvailabilityConfig.removeAvailableDate(testDates[2]);
+            const afterThird = window.DateAvailabilityConfig.getAvailableDates();
+
+            // Check results
+            const firstStillUnavailable = !afterSecond.includes(testDates[0]);
+            const secondStillUnavailable = !afterThird.includes(testDates[1]);
+            const thirdUnavailable = !afterThird.includes(testDates[2]);
+
+            if (firstStillUnavailable && secondStillUnavailable && thirdUnavailable) {
+                addResult('✅ SUCCESS: Multiple dates set to unavailable correctly', 'success');
+            } else {
+                addResult('❌ FAILED: Some dates were reset when setting others unavailable', 'error');
+            }
+
+            refreshStatus();
+        }
+
+        function testMultipleAvailable() {
+            if (!window.DateAvailabilityConfig) {
+                addResult('DateAvailabilityConfig not available', 'error');
+                return;
+            }
+
+            // Create some test dates
+            const today = new Date();
+            const testDates = [];
+            for (let i = 1; i <= 3; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i + 50); // Use dates far in future
+                testDates.push(window.DateAvailabilityConfig.formatDate(date));
+            }
+
+            addResult(`Testing with dates: ${testDates.join(', ')}`, 'success');
+
+            // Make sure they start as unavailable
+            testDates.forEach(date => {
+                window.DateAvailabilityConfig.removeAvailableDate(date);
+            });
+
+            // Set first date available
+            window.DateAvailabilityConfig.addAvailableDate(testDates[0]);
+            const afterFirst = window.DateAvailabilityConfig.getAvailableDates();
+            
+            // Set second date available
+            window.DateAvailabilityConfig.addAvailableDate(testDates[1]);
+            const afterSecond = window.DateAvailabilityConfig.getAvailableDates();
+
+            // Set third date available
+            window.DateAvailabilityConfig.addAvailableDate(testDates[2]);
+            const afterThird = window.DateAvailabilityConfig.getAvailableDates();
+
+            // Check results
+            const firstStillAvailable = afterSecond.includes(testDates[0]);
+            const secondStillAvailable = afterThird.includes(testDates[1]);
+            const thirdAvailable = afterThird.includes(testDates[2]);
+
+            if (firstStillAvailable && secondStillAvailable && thirdAvailable) {
+                addResult('✅ SUCCESS: Multiple dates set to available correctly', 'success');
+            } else {
+                addResult('❌ FAILED: Some dates were reset when setting others available', 'error');
+            }
+
+            refreshStatus();
+        }
+
+        function resetToDefaults() {
+            if (!window.DateAvailabilityConfig) {
+                addResult('DateAvailabilityConfig not available', 'error');
+                return;
+            }
+
+            window.DateAvailabilityConfig.resetToMondayFriday();
+            addResult('Reset to Monday-Friday defaults', 'success');
+            refreshStatus();
+        }
+    </script>
+</body>
+</html>
